@@ -2,7 +2,7 @@
   "name": "swagger-to-plantuml",
   "version": "1.0.0",
   "description": "Convert swagger and openAPI definition in PlantUML diagrams.",
-  "main": "./src/index.js",
+  "private": true,
   "directories": {
     "doc": "doc",
     "test": "test"
@@ -16,5 +16,11 @@
     "openAPI"
   ],
   "author": "Marco LUCARELLA",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.4.4",
+    "webpack": "^5.58.2",
+    "webpack-cli": "^4.9.0"
+  }
 }
