@@ -1,4 +1,4 @@
-import { IDocObject, IDocumentation } from './documentation/documentation'
+import { EDocTypes, IDocObject, IDocumentation } from './documentation/documentation'
 import SwaggerDoc from './documentation/swaggerDocumentation'
 import OpenApiDocumentation from './documentation/openApiDocumentation'
 import DiagramBuilder, { IOptions } from './diagramBuilder'
@@ -37,10 +37,7 @@ export default class SwaggerToPlantuml {
         const definitions = this.doc.getDefinitions()
         for (const defName in definitions) {
             console.log('definition:', defName)
-            const definition = definitions[defName]
-            if (definition.type === 'object') {
-                this.diagram.buildObject(defName, definition as IDocObject)
-            }
+            this.diagram.buildDefinition(defName, definitions[defName])
         }
     }
 }
