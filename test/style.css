@@ -2,10 +2,20 @@
     max-height: 200px;
     overflow: auto;
     background-color: #eff;
+    width: 100%;
+}
+
+.results {
+    display: flex;
+}
+
+.results>div{
+    width: 50%;
 }
 
 .diagram {
-    max-height: 200px;
     overflow: auto;
     background-color: #fef;
+    margin: 0;
+    width: 100%;
 }

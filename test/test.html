@@ -12,15 +12,21 @@
 <body>
     <div class="container">
         <h2>Documentation</h2>
-        <div id="documentation" class="documentation">
+        <div id="documentation" class="documentation" contenteditable="true">
             Documentation imported from JSON File
         </div>
-        <h2>PlantUML Text</h2>
-        <div id="plantUml" class="diagram">
-            Diagram generated
+        <div class="results">
+            <div>
+                <h2>PlantUML Text</h2>
+                <pre id="digramText" class="diagram">
+                    Diagram generated
+                </pre>
+            </div>
+            <div>
+                <h2>PlantUML Image</h2>
+                <img src="http://www.plantuml.com/plantuml/png/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000" alt="Diagram" id="diagramImage" />
+            </div>
         </div>
-        <h2>PlantUML Image</h2>
-        <img src="http://www.plantuml.com/plantuml/png/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000" alt="Diagram" />
     </div>
     <script src="../dist/swagger-to-plantuml.js"></script>
     <script>
@@ -31,7 +37,8 @@
 
             const generator = new SwaggerToPlantuml(documentationJson)
             generator.execute()
-            document.getElementById('plantUml').textContent = generator.getDiagramText()
+            document.getElementById('digramText').textContent = generator.getDiagramText()
+            document.getElementById('diagramImage').src = generator.getDiagramImageUri()
         })()
     </script>
 </body>

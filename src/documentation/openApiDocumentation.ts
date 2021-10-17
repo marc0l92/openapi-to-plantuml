@@ -1,9 +1,14 @@
-import Documentation from "./documentation";
+import { IDocDefinition, IDocumentation } from "./documentation";
 
-export default class OpenApiDocumentation implements Documentation {
+export default class OpenApiDocumentation implements IDocumentation {
     private doc: Object
 
     constructor(docJson: Object) {
         this.doc = docJson
     }
+
+    getDefinitions() {
+        return {}
+    }
+
 }
