@@ -1,0 +1,11 @@
+.documentation {
+    max-height: 200px;
+    overflow: auto;
+    background-color: #eff;
+}
+
+.diagram {
+    max-height: 200px;
+    overflow: auto;
+    background-color: #fef;
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test swagger-to-plantuml</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Documentation</h2>
+        <div id="documentation" class="documentation">
+            Documentation imported from JSON File
+        </div>
+        <h2>PlantUML Text</h2>
+        <div id="plantUml" class="diagram">
+            Diagram generated
+        </div>
+        <h2>PlantUML Image</h2>
+        <img src="http://www.plantuml.com/plantuml/png/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000" alt="Diagram" />
+    </div>
+    <script src="../dist/swagger-to-plantuml.js"></script>
+    <script>
+        (async () => {
+            const response = await fetch('./documentations/swagger.json')
+            const documentationJson = await response.json()
+            document.getElementById('documentation').textContent = JSON.stringify(documentationJson)
+
+            const generator = new SwaggerToPlantuml(documentationJson)
+            generator.execute()
+            document.getElementById('plantUml').textContent = generator.getDiagramText()
+        })()
+    </script>
+</body>
+
+</html>
