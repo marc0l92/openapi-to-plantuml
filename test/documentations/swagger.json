@@ -1040,10 +1040,22 @@
                     "type": "integer",
                     "format": "int32",
                     "description": "User Status"
+                },
+                "test": {
+                    "$ref": "#/definitions/MyArray1"
                 }
             },
             "xml": {
                 "name": "User"
+            }
+        },
+        "MyArray1": {
+            "$ref": "#/definitions/MyArray2"
+        },
+        "MyArray2": {
+            "type": "array",
+            "items": {
+                "type": "string"
             }
         }
     },

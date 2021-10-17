@@ -1,4 +1,4 @@
-import { EDocTypes, IDocArray, IDocDefinition, IDocObject } from "./documentation/documentation"
+import { EDocTypes, IDocArray, IDocDefinition, IDocMapOfDefinitions, IDocObject } from "./documentation/documentation"
 import * as plantumlEncoder from 'plantuml-encoder'
 
 export interface IOptions {
@@ -20,30 +20,17 @@ function getRefName(ref: string): string {
     throw 'Invalid reference: ' + ref
 }
 
-function getDefName(def: IDocDefinition): string {
-    if (def) {
-        if (def.title) {
-            return def.title
-        }
-        if (def.type) {
-            return def.type
-        }
-        if (def.$ref) {
-            return getRefName(def.$ref)
-        }
-    }
-    console.warn('No name defined for the definition:', def)
-    return 'NoName'
-}
-
 export default class DiagramBuilder {
     private options: IOptions
     private diagramText: string
+    private definitions: IDocMapOfDefinitions = {}
 
     constructor(options: IOptions) {
         this.diagramText = '@startuml\n'
         this.options = Object.assign(defaultOptions, options)
     }
+
+    // Getters
 
     getDiagramText(): string {
         return this.diagramText + '@enduml'
@@ -54,16 +41,64 @@ export default class DiagramBuilder {
         return this.options.serverUrl + '/' + this.options.format + '/' + encodedDiagram
     }
 
-    buildDefinition(name: string, definition: IDocDefinition): void {
-        if (definition.title) {
-            name = definition.title
+    // Setters
+
+    setDefinitions(definitions: IDocMapOfDefinitions): void {
+        this.definitions = definitions
+    }
+
+    // Internals
+
+    private getDefName(def: IDocDefinition): string {
+        if (def) {
+            if (def.title) {
+                return def.title
+            }
+            if (def.$ref) {
+                const refName = getRefName(def.$ref)
+                if (refName in this.definitions) {
+                    const childName = this.getDefName(this.definitions[refName])
+                    return childName === '<i>object</i>' ? refName : childName
+                }
+                return refName
+            }
+            if (def.type) {
+                if (def.type === 'array' && (def as IDocArray).items) {
+                    return `[${this.getDefName((def as IDocArray).items)}]`
+                }
+                return `<i>${def.type}</i>`
+            }
         }
-        switch (definition.type) {
+        console.warn('No name defined for the definition:', def)
+        return 'NoName'
+    }
+
+    // Builder
+
+    buildTitle(title: string): void {
+        this.diagramText += `title ${title}\n`
+    }
+
+    buildDefinition(name: string, def: IDocDefinition): void {
+        if (def.title) {
+            name = def.title
+        }
+        if (!def.type) {
+            def.type = EDocTypes.Object
+        }
+        switch (def.type) {
             case EDocTypes.Object:
-                this.buildObject(name, definition as IDocObject)
+                if (!def.$ref) {
+                    this.buildObject(name, def as IDocObject)
+                }
+                break
+            case EDocTypes.Array:
+            case EDocTypes.Boolean:
+            case EDocTypes.Integer:
+            case EDocTypes.String:
                 break
             default:
-            // throw 'Definition type not supported: ' + definition.type
+                throw 'Definition type not supported: ' + def.type
         }
     }
 
@@ -71,20 +106,23 @@ export default class DiagramBuilder {
         if (property.title) {
             name = property.title
         }
+        if (!property.type) {
+            property.type = EDocTypes.Object
+        }
         switch (property.type) {
             case EDocTypes.Array:
-                this.diagramText += `  {field} ${name}: [${getDefName((property as IDocArray).items)}]\n`
+                this.diagramText += `  {field} ${name}: [${this.getDefName((property as IDocArray).items)}]\n`
                 break
             case EDocTypes.Object:
-                this.diagramText += `  {field} ${name}: {}\n`
+                this.diagramText += `  {field} ${name}: ${this.getDefName(property)}\n`
                 break
             case EDocTypes.Boolean:
             case EDocTypes.Integer:
             case EDocTypes.String:
-                this.diagramText += `  {field} ${name}: ${property.type}\n`
+                this.diagramText += `  {field} ${name}: <i>${property.type}</i>\n`
                 break
             default:
-            // throw 'Property type not supported: ' + property.type
+                throw 'Property type not supported: ' + property.type
         }
     }
 

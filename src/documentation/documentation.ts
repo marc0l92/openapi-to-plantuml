@@ -1,5 +1,7 @@
 export interface IDocumentation {
-    getDefinitions: () => { [index: string]: IDocDefinition }
+    getTitle: () => string
+    getDefinitions: () => IDocMapOfDefinitions
+    getServices: () => IDocService[]
 }
 
 export enum EDocTypes {
@@ -10,6 +12,13 @@ export enum EDocTypes {
     String = 'string',
 }
 
+export interface IDocService {
+    path: string
+    method: string
+    request?: IDocDefinition
+    response?: IDocDefinition
+}
+
 export interface IDocDefinition {
     type?: EDocTypes
     title?: string
@@ -17,9 +26,13 @@ export interface IDocDefinition {
 }
 
 export interface IDocObject extends IDocDefinition {
-    properties?: { [index: string]: IDocDefinition }
+    properties?: IDocMapOfDefinitions
 }
 
 export interface IDocArray extends IDocDefinition {
     items?: IDocDefinition
+}
+
+export interface IDocMapOfDefinitions {
+    [index: string]: IDocDefinition
 }

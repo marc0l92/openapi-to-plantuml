@@ -35,9 +35,13 @@ export default class SwaggerToPlantuml {
     execute(): void {
         console.log('execute')
         const definitions = this.doc.getDefinitions()
+        this.diagram.setDefinitions(definitions)
+        
+        this.diagram.buildTitle(this.doc.getTitle())
         for (const defName in definitions) {
             console.log('definition:', defName)
             this.diagram.buildDefinition(defName, definitions[defName])
         }
+
     }
 }
