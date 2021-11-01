@@ -1,4 +1,4 @@
-import { IDocService, Documentation } from "./definition";
+import { Documentation } from "./definition";
 
 export default class OpenApiDocumentation extends Documentation {
     private _doc: Object
@@ -21,8 +21,7 @@ export default class OpenApiDocumentation extends Documentation {
     }
 
     getServices() {
-        let services: IDocService[] = []
-        return services
+        return {}
     }
 
     getDefinitions() {

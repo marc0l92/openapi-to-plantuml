@@ -14,44 +14,50 @@
     <section class="section">
         <div class="container">
             <h1 class="title">OpenAPI Documentation</h1>
-            <p class="subtitle">Paste here your OpenApi documentation:</p>
-            <textarea id="documentation" class="documentation textarea"
-                placeholder="Paste here your OpenApi Documentation"></textarea>
+            <p class="subtitle">Paste here your OpenApi documentation</p>
+            <div class="columns">
+                <div class="column">
+                    <textarea id="documentation" class="documentation textarea"
+                        placeholder="Paste here your OpenApi Documentation"></textarea>
+                </div>
+            </div>
         </div>
     </section>
     <section class="section">
         <div class="container">
             <h1 class="title">PlantUML Diagrams</h1>
+            <p class="subtitle">Select the service to explore</p>
             <div class="columns">
-
-                <div class="column">
+                <div class="column is-3">
                     <aside class="menu">
-                        <ul class="menu-list">
-                            <li>
-                                /pet/{petId}/uploadImage
-                                <ul>
-                                    <li><a class="is-active">POST</a></li>
-                                    <li><a>GET</a></li>
-                                    <li><a>PUT</a></li>
-                                </ul>
-                            </li>
+                        <ul class="menu-list" id="servicesMenu">
                         </ul>
                     </aside>
                 </div>
 
                 <div class="column">
-                    <div class="tabs">
+                    <div class="tabs" id="diagramsTabs">
                         <ul>
-                            <li class="is-active"><a>Text</a></li>
-                            <li><a>Image</a></li>
+                            <li class="is-active" data-tab="requestTab"><a>Request</a></li>
+                            <li data-tab="responseTab"><a>Response</a></li>
                         </ul>
                     </div>
-                    <pre id="digramText" class="diagram">
-                        Diagram generated
-                    </pre>
-                    <h2 class="subtitle">PlantUML Image</h2>
-                    <img src="http://www.plantuml.com/plantuml/png/SoWkIImgAStDuN98pKi1qW00" alt="Diagram"
-                        id="diagramImage" />
+                    <div id="requestTab">
+                        <pre id="requestText" class="diagram textarea block" contenteditable="true"></pre>
+                        <div class="block">
+                            <a href="#" id="requestLink" target="blank" class="mb-5">Open image in a new tab...</a>
+                        </div>
+                        <img src="http://www.plantuml.com/plantuml/png/SoWkIImgAStDuN98pKi1qW00" alt="Diagram"
+                            id="requestImage" />
+                    </div>
+                    <div class="is-hidden" id="responseTab">
+                        <pre id="responseText" class="diagram textarea block" contenteditable="true"></pre>
+                        <div class="block">
+                            <a href="#" id="responseLink" target="blank">Open image in a new tab...</a>
+                        </div>
+                        <img src="http://www.plantuml.com/plantuml/png/SoWkIImgAStDuN98pKi1qW00" alt="Diagram"
+                            id="responseImage" />
+                    </div>
                 </div>
 
             </div>
@@ -67,16 +73,93 @@
     </footer>
     <script src="../dist/swagger-to-plantuml.js"></script>
     <script>
-        (async () => {
-            const response = await fetch('./documentations/swagger.json')
-            const documentationJson = await response.json()
-            document.getElementById('documentation').textContent = JSON.stringify(documentationJson)
+        let diagrams = {};
 
-            const generator = new SwaggerToPlantuml(documentationJson)
-            await generator.execute()
-            // document.getElementById('digramText').textContent = generator.getDiagramText()
-            // document.getElementById('diagramImage').src = generator.getDiagramImageUri()
-        })()
+        function updateAsideMenu() {
+            const servicesMenuElem = document.getElementById('servicesMenu');
+            servicesMenuElem.innerHTML = '';
+
+            for (const path in diagrams) {
+                const liPath = document.createElement('li');
+                liPath.append(path);
+                const ulMethods = document.createElement('ul');
+                for (const method in diagrams[path]) {
+                    const liMethod = document.createElement('li');
+                    const aMethod = document.createElement('a');
+                    aMethod.innerHTML = method;
+                    liMethod.addEventListener('click', (e) => {
+                        clearAsideMenuActive();
+                        e.target.className = 'is-active';
+                        const diagram = diagrams[path][method];
+                        if (diagram.request) {
+                            document.getElementById('requestText').innerHTML = diagram.request.diagram;
+                            document.getElementById('requestLink').href = diagram.request.imageUri;
+                            document.getElementById('requestImage').src = diagram.request.imageUri;
+                            document.getElementById('requestLink').className = '';
+                            document.getElementById('requestImage').className = '';
+                        } else {
+                            document.getElementById('requestText').innerHTML = 'No Request';
+                            document.getElementById('requestLink').className = 'is-hidden';
+                            document.getElementById('requestImage').className = 'is-hidden';
+                        }
+                        if (diagram.response) {
+                            document.getElementById('responseText').innerHTML = diagram.response.diagram;
+                            document.getElementById('responseLink').href = diagram.response.imageUri;
+                            document.getElementById('responseImage').src = diagram.response.imageUri;
+                            document.getElementById('responseLink').className = '';
+                            document.getElementById('responseImage').className = '';
+                        } else {
+                            document.getElementById('responseText').innerHTML = 'No Response';
+                            document.getElementById('responseLink').className = 'is-hidden';
+                            document.getElementById('responseImage').className = 'is-hidden';
+                        }
+                    });
+                    liMethod.append(aMethod);
+                    ulMethods.append(liMethod);
+                }
+                liPath.append(ulMethods);
+                servicesMenuElem.appendChild(liPath);
+            }
+        }
+
+        function clearAsideMenuActive() {
+            const servicesMenuElem = document.getElementById('servicesMenu');
+            const activeElements = servicesMenuElem.querySelectorAll('.is-active');
+            for (const activeElement of activeElements) {
+                activeElement.className = '';
+            }
+        }
+
+        async function generateDiagrams() {
+            const documentation = document.getElementById('documentation').value;
+            const generator = new SwaggerToPlantuml(JSON.parse(documentation));
+            await generator.execute();
+            diagrams = generator.getDiagrams();
+            updateAsideMenu();
+        }
+        document.getElementById('documentation').addEventListener('input', generateDiagrams);
+
+        document.querySelectorAll('#diagramsTabs li').forEach(diagramTab => {
+            diagramTab.addEventListener('click', (e) => {
+                clearDiagramsTabActive();
+                diagramTab.className = 'is-active';
+                document.getElementById(diagramTab.dataset.tab).className = '';
+            });
+        });
+        function clearDiagramsTabActive() {
+            const activeTabs = document.querySelectorAll('#diagramsTabs li.is-active');
+            for (const activeTab of activeTabs) {
+                activeTab.className = '';
+                document.getElementById(activeTab.dataset.tab).className = 'is-hidden';
+            }
+        }
+
+        (async () => {
+            const response = await fetch('./documentations/swagger.json');
+            const documentationJson = await response.json();
+            document.getElementById('documentation').textContent = JSON.stringify(documentationJson);
+            generateDiagrams();
+        })();
     </script>
 </body>
 

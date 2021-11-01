@@ -1,4 +1,4 @@
-import { IDocDefinition, IDocMapOfDefinitions, IDocService, Documentation } from "./definition"
+import { IDocDefinition, IDocMapOfDefinitions, Documentation, IDocServices } from "./definition"
 
 interface ISwaggerDoc {
     info?: {
@@ -57,35 +57,28 @@ export default class SwaggerDoc extends Documentation {
     }
 
     getServices() {
-        let services: IDocService[] = []
+        let services: IDocServices = {}
         for (const path in this._doc.paths) {
+            services[path] = {}
             for (const method in this._doc.paths[path]) {
-                const service = this._doc.paths[path][method]
-                let request: IDocDefinition = {}
-                let response: IDocDefinition = {}
+                services[path][method] = {}
+                const docService = this._doc.paths[path][method]
 
-                if (service.parameters) {
-                    const bodyParam = service.parameters.find((p) => p.in === 'body')
+                if (docService.parameters) {
+                    const bodyParam = docService.parameters.find((p) => p.in === 'body')
                     if (bodyParam) {
-                        request = bodyParam.schema
+                        services[path][method].request = bodyParam.schema
                     }
                 }
 
-                if (service.responses) {
-                    for (const statusCode in service.responses) {
-                        if (statusCode.match(/^2[0-9][0-9]$/) && service.responses[statusCode].schema) {
-                            response = service.responses[statusCode].schema
+                if (docService.responses) {
+                    for (const statusCode in docService.responses) {
+                        if (statusCode.match(/^2[0-9][0-9]$/) && docService.responses[statusCode].schema) {
+                            services[path][method].response = docService.responses[statusCode].schema
                             break
                         }
                     }
                 }
-
-                services.push({
-                    path: path,
-                    method: method,
-                    request: request,
-                    response: response,
-                })
             }
         }
         return services

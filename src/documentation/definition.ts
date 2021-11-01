@@ -20,7 +20,7 @@ export abstract class Documentation {
 
     abstract getTitle(): string
     abstract getDefinitions(): IDocMapOfDefinitions
-    abstract getServices(): IDocService[]
+    abstract getServices(): IDocServices
 }
 
 export enum EDocTypes {
@@ -31,11 +31,13 @@ export enum EDocTypes {
     String = 'string',
 }
 
-export interface IDocService {
-    method: string
-    path: string
-    request?: IDocDefinition
-    response?: IDocDefinition
+export interface IDocServices {
+    [index: string]: {
+        [index: string]: {
+            request?: IDocDefinition
+            response?: IDocDefinition
+        }
+    }
 }
 
 export interface IDocDefinition {

@@ -1,12 +1,16 @@
 .documentation {
     min-height: 100px;
+    height: 150px;
     overflow: auto;
     resize: vertical;
     width: 100%;
 }
 
 .diagram {
+    min-height: 100px;
+    height: 150px;
     overflow: auto;
+    resize: vertical;
     background-color: #fef;
     margin: 0;
     width: 100%;
