@@ -32,8 +32,8 @@ export enum EDocTypes {
 }
 
 export interface IDocService {
-    path: string
     method: string
+    path: string
     request?: IDocDefinition
     response?: IDocDefinition
 }
