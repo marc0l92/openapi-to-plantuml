@@ -1,10 +1,19 @@
-import { IDocDefinition, IDocService, IDocumentation } from "./documentation";
+import { IDocService, Documentation } from "./definition";
 
-export default class OpenApiDocumentation implements IDocumentation {
-    private doc: Object
+export default class OpenApiDocumentation extends Documentation {
+    private _doc: Object
 
     constructor(docJson: Object) {
-        this.doc = docJson
+        super()
+        this._doc = docJson
+    }
+
+    protected get doc(): any {
+        return this._doc;
+    }
+
+    protected set doc(doc: any) {
+        this._doc = doc;
     }
 
     getTitle() {

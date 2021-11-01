@@ -36,7 +36,7 @@
             document.getElementById('documentation').textContent = JSON.stringify(documentationJson)
 
             const generator = new SwaggerToPlantuml(documentationJson)
-            generator.execute()
+            await generator.execute()
             document.getElementById('digramText').textContent = generator.getDiagramText()
             document.getElementById('diagramImage').src = generator.getDiagramImageUri()
         })()

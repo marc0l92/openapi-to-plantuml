@@ -18,7 +18,9 @@
   "author": "Marco LUCARELLA",
   "license": "MIT",
   "devDependencies": {
+    "@apidevtools/json-schema-ref-parser": "^9.0.9",
     "@types/plantuml-encoder": "^1.4.0",
+    "node-polyfill-webpack-plugin": "^1.1.4",
     "ts-loader": "^9.2.6",
     "typescript": "^4.4.4",
     "webpack": "^5.58.2",

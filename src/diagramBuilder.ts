@@ -1,4 +1,4 @@
-import { EDocTypes, IDocArray, IDocDefinition, IDocMapOfDefinitions, IDocObject } from "./documentation/documentation"
+import { EDocTypes, IDocArray, IDocDefinition, IDocObject } from "./documentation/definition"
 import * as plantumlEncoder from 'plantuml-encoder'
 
 export interface IOptions {
@@ -11,19 +11,9 @@ const defaultOptions: IOptions = {
     format: 'svg'
 }
 
-const refNameRegexp = /\/([^\/]+)$/
-function getRefName(ref: string): string {
-    const matches = refNameRegexp.exec(ref)
-    if (matches && matches[1]) {
-        return matches[1]
-    }
-    throw 'Invalid reference: ' + ref
-}
-
 export default class DiagramBuilder {
     private options: IOptions
     private diagramText: string
-    private definitions: IDocMapOfDefinitions = {}
 
     constructor(options: IOptions) {
         this.diagramText = '@startuml\n'
@@ -41,26 +31,12 @@ export default class DiagramBuilder {
         return this.options.serverUrl + '/' + this.options.format + '/' + encodedDiagram
     }
 
-    // Setters
-
-    setDefinitions(definitions: IDocMapOfDefinitions): void {
-        this.definitions = definitions
-    }
-
     // Internals
 
     private getDefName(def: IDocDefinition): string {
         if (def) {
             if (def.title) {
                 return def.title
-            }
-            if (def.$ref) {
-                const refName = getRefName(def.$ref)
-                if (refName in this.definitions) {
-                    const childName = this.getDefName(this.definitions[refName])
-                    return childName === '<i>object</i>' ? refName : childName
-                }
-                return refName
             }
             if (def.type) {
                 if (def.type === 'array' && (def as IDocArray).items) {
@@ -79,7 +55,8 @@ export default class DiagramBuilder {
         this.diagramText += `title ${title}\n`
     }
 
-    buildDefinition(name: string, def: IDocDefinition): void {
+    buildDefinition(def: IDocDefinition): void {
+        let name = 'InlineDefinition'
         if (def.title) {
             name = def.title
         }
@@ -88,9 +65,7 @@ export default class DiagramBuilder {
         }
         switch (def.type) {
             case EDocTypes.Object:
-                if (!def.$ref) {
-                    this.buildObject(name, def as IDocObject)
-                }
+                this.buildObject(name, def as IDocObject)
                 break
             case EDocTypes.Array:
             case EDocTypes.Boolean:

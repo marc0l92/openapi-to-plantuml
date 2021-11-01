@@ -1,4 +1,4 @@
-import { IDocDefinition, IDocMapOfDefinitions, IDocService, IDocumentation } from "./documentation";
+import { IDocDefinition, IDocMapOfDefinitions, IDocService, Documentation } from "./definition"
 
 interface ISwaggerDoc {
     info?: {
@@ -27,21 +27,30 @@ interface IServiceParameter {
     schema?: IDocDefinition
 }
 
-export default class SwaggerDoc implements IDocumentation {
-    private doc: ISwaggerDoc
+export default class SwaggerDoc extends Documentation {
+    private _doc: ISwaggerDoc
 
     constructor(docJson: Object) {
-        this.doc = docJson
+        super()
+        this._doc = docJson
+    }
+
+    protected get doc(): any {
+        return this._doc;
+    }
+
+    protected set doc(doc: any) {
+        this._doc = doc;
     }
 
     getTitle() {
         let title = []
-        if (this.doc.info) {
-            if (this.doc.info.title) {
-                title.push(this.doc.info.title)
+        if (this._doc.info) {
+            if (this._doc.info.title) {
+                title.push(this._doc.info.title)
             }
-            if (this.doc.info.version) {
-                title.push(`[v${this.doc.info.version}]`)
+            if (this._doc.info.version) {
+                title.push(`[v${this._doc.info.version}]`)
             }
         }
         return title.join(' ')
@@ -49,9 +58,9 @@ export default class SwaggerDoc implements IDocumentation {
 
     getServices() {
         let services: IDocService[] = []
-        for (const path in this.doc.paths) {
-            for (const method in this.doc.paths[path]) {
-                const service = this.doc.paths[path][method]
+        for (const path in this._doc.paths) {
+            for (const method in this._doc.paths[path]) {
+                const service = this._doc.paths[path][method]
                 let request: IDocDefinition = {}
                 let response: IDocDefinition = {}
 
@@ -83,8 +92,8 @@ export default class SwaggerDoc implements IDocumentation {
     }
 
     getDefinitions() {
-        if ('definitions' in this.doc) {
-            return this.doc.definitions
+        if ('definitions' in this._doc) {
+            return this._doc.definitions
         }
         return {}
     }

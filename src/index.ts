@@ -1,10 +1,10 @@
-import { EDocTypes, IDocObject, IDocumentation } from './documentation/documentation'
+import { Documentation } from './documentation/definition'
 import SwaggerDoc from './documentation/swaggerDocumentation'
 import OpenApiDocumentation from './documentation/openApiDocumentation'
 import DiagramBuilder, { IOptions } from './diagramBuilder'
 
 export default class SwaggerToPlantuml {
-    private doc: IDocumentation
+    private doc: Documentation
     private diagram: DiagramBuilder
 
     constructor(docJson: any, options: IOptions) {
@@ -20,7 +20,6 @@ export default class SwaggerToPlantuml {
         } else {
             throw 'Input documentation format not supported'
         }
-
         this.diagram = new DiagramBuilder(options || {})
     }
 
@@ -32,15 +31,15 @@ export default class SwaggerToPlantuml {
         return this.diagram.getDiagramImageUri()
     }
 
-    execute(): void {
+    async execute(): Promise<void> {
         console.log('execute')
+        await this.doc.resolveRefs()
         const definitions = this.doc.getDefinitions()
-        this.diagram.setDefinitions(definitions)
-        
+
         this.diagram.buildTitle(this.doc.getTitle())
         for (const defName in definitions) {
             console.log('definition:', defName)
-            this.diagram.buildDefinition(defName, definitions[defName])
+            this.diagram.buildDefinition(definitions[defName])
         }
 
     }
