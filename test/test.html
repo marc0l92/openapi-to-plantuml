@@ -6,28 +6,65 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test swagger-to-plantuml</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-    <div class="container">
-        <h2>Documentation</h2>
-        <div id="documentation" class="documentation" contenteditable="true">
-            Documentation imported from JSON File
+    <section class="section">
+        <div class="container">
+            <h1 class="title">OpenAPI Documentation</h1>
+            <p class="subtitle">Paste here your OpenApi documentation:</p>
+            <textarea id="documentation" class="documentation textarea"
+                placeholder="Paste here your OpenApi Documentation"></textarea>
         </div>
-        <div class="results">
-            <div>
-                <h2>PlantUML Text</h2>
-                <pre id="digramText" class="diagram">
-                    Diagram generated
-                </pre>
-            </div>
-            <div>
-                <h2>PlantUML Image</h2>
-                <img src="http://www.plantuml.com/plantuml/png/SoWkIImgAStDuN98pKi1qW00" alt="Diagram" id="diagramImage" />
+    </section>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">PlantUML Diagrams</h1>
+            <div class="columns">
+
+                <div class="column">
+                    <aside class="menu">
+                        <ul class="menu-list">
+                            <li>
+                                /pet/{petId}/uploadImage
+                                <ul>
+                                    <li><a class="is-active">POST</a></li>
+                                    <li><a>GET</a></li>
+                                    <li><a>PUT</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </aside>
+                </div>
+
+                <div class="column">
+                    <div class="tabs">
+                        <ul>
+                            <li class="is-active"><a>Text</a></li>
+                            <li><a>Image</a></li>
+                        </ul>
+                    </div>
+                    <pre id="digramText" class="diagram">
+                        Diagram generated
+                    </pre>
+                    <h2 class="subtitle">PlantUML Image</h2>
+                    <img src="http://www.plantuml.com/plantuml/png/SoWkIImgAStDuN98pKi1qW00" alt="Diagram"
+                        id="diagramImage" />
+                </div>
+
             </div>
         </div>
-    </div>
+    </section>
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <p>
+                <strong>swagger-to-plantuml</strong> by <a href="https://github.com/marc0l92">mar0l92</a>. The libray
+                repository is available <a href="https://github.com/marc0l92">on GitHub</a>.
+            </p>
+        </div>
+    </footer>
     <script src="../dist/swagger-to-plantuml.js"></script>
     <script>
         (async () => {
@@ -37,8 +74,8 @@
 
             const generator = new SwaggerToPlantuml(documentationJson)
             await generator.execute()
-            document.getElementById('digramText').textContent = generator.getDiagramText()
-            document.getElementById('diagramImage').src = generator.getDiagramImageUri()
+            // document.getElementById('digramText').textContent = generator.getDiagramText()
+            // document.getElementById('diagramImage').src = generator.getDiagramImageUri()
         })()
     </script>
 </body>

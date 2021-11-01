@@ -1,16 +1,8 @@
 .documentation {
-    max-height: 100px;
+    min-height: 100px;
     overflow: auto;
-    background-color: #eff;
+    resize: vertical;
     width: 100%;
-}
-
-.results {
-    display: flex;
-}
-
-.results>div{
-    width: 50%;
 }
 
 .diagram {
