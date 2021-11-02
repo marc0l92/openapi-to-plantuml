@@ -11,6 +11,10 @@ const defaultOptions: IOptions = {
     format: 'svg'
 }
 
+const safeStr = (str: string) => {
+    return JSON.stringify(str)
+}
+
 export default class DiagramBuilder {
     private options: IOptions
     private diagramText: string
@@ -52,10 +56,11 @@ export default class DiagramBuilder {
     // Builder
 
     buildTitle(title: string): void {
-        this.diagramText += `title ${title}\n`
+        this.diagramText += `title ${safeStr(title)}\n`
     }
 
     buildDefinition(def: IDocDefinition): void {
+        let usedDefinitions: IDocDefinition[] = []
         let name = 'InlineDefinition'
         if (def.title) {
             name = def.title
@@ -63,21 +68,31 @@ export default class DiagramBuilder {
         if (!def.type) {
             def.type = EDocTypes.Object
         }
+
         switch (def.type) {
             case EDocTypes.Object:
-                this.buildObject(name, def as IDocObject)
+                usedDefinitions = this.buildObject(name, def as IDocObject)
                 break
             case EDocTypes.Array:
+                name += '[]'
+                usedDefinitions = this.buildObject(name, (def as IDocArray).items as IDocObject, 'abstract')
+                break
             case EDocTypes.Boolean:
             case EDocTypes.Integer:
             case EDocTypes.String:
+                this.buildBasicType(def.type)
                 break
             default:
                 throw 'Definition type not supported: ' + def.type
         }
+        usedDefinitions.forEach(usedDefinition => {
+            this.buildDefinition(usedDefinition)
+            this.buildLink(name, this.getDefName(usedDefinition))
+        })
     }
 
-    buildProperty(name: string, property: IDocDefinition): void {
+    buildProperty(name: string, property: IDocDefinition): IDocDefinition[] {
+        let usedDefinitions: IDocDefinition[] = []
         if (property.title) {
             name = property.title
         }
@@ -87,9 +102,13 @@ export default class DiagramBuilder {
         switch (property.type) {
             case EDocTypes.Array:
                 this.diagramText += `  {field} ${name}: [${this.getDefName((property as IDocArray).items)}]\n`
+                if ((property as IDocArray).items.type === EDocTypes.Object) {
+                    usedDefinitions.push((property as IDocArray).items)
+                }
                 break
             case EDocTypes.Object:
                 this.diagramText += `  {field} ${name}: ${this.getDefName(property)}\n`
+                usedDefinitions.push(property)
                 break
             case EDocTypes.Boolean:
             case EDocTypes.Integer:
@@ -99,13 +118,27 @@ export default class DiagramBuilder {
             default:
                 throw 'Property type not supported: ' + property.type
         }
+        return usedDefinitions
     }
 
-    buildObject(name: string, objDef: IDocObject): void {
-        this.diagramText += `class ${name} {\n`
+    buildObject(name: string, objDef: IDocObject, type: string = 'class'): IDocDefinition[] {
+        let usedDefinitions: IDocDefinition[] = []
+        this.diagramText += `${type} ${safeStr(name)} {\n`
         for (const propName in objDef.properties) {
-            this.buildProperty(propName, objDef.properties[propName])
+            usedDefinitions = usedDefinitions.concat(this.buildProperty(propName, objDef.properties[propName]))
+        }
+        if ('additionalProperties' in objDef) {
+            usedDefinitions = usedDefinitions.concat(this.buildProperty('{*}', objDef.additionalProperties))
         }
         this.diagramText += `}\n`
+        return usedDefinitions
+    }
+
+    buildBasicType(type: string): void {
+        this.diagramText += `entity ${type} {}\n`
+    }
+
+    buildLink(from: string, to: string): void {
+        this.diagramText += `${safeStr(from)} --> ${safeStr(to)}\n`
     }
 }

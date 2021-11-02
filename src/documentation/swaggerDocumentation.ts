@@ -72,9 +72,11 @@ export default class SwaggerDoc extends Documentation {
                 }
 
                 if (docService.responses) {
-                    for (const statusCode in docService.responses) {
-                        if (statusCode.match(/^2[0-9][0-9]$/) && docService.responses[statusCode].schema) {
-                            services[path][method].response = docService.responses[statusCode].schema
+                    for (const statusCode of Object.keys(docService.responses).sort()) {
+                        if (statusCode.match(/^2[0-9][0-9]$/) || statusCode === 'default') {
+                            if (docService.responses[statusCode].schema) {
+                                services[path][method].response = docService.responses[statusCode].schema
+                            }
                             break
                         }
                     }

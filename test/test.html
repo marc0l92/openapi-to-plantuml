@@ -38,25 +38,25 @@
                 <div class="column">
                     <div class="tabs" id="diagramsTabs">
                         <ul>
-                            <li class="is-active" data-tab="requestTab"><a>Request</a></li>
+                            <li data-tab="requestTab" class="is-active"><a>Request</a></li>
                             <li data-tab="responseTab"><a>Response</a></li>
                         </ul>
                     </div>
-                    <div id="requestTab">
-                        <pre id="requestText" class="diagram textarea block" contenteditable="true"></pre>
-                        <div class="block">
-                            <a href="#" id="requestLink" target="blank" class="mb-5">Open image in a new tab...</a>
+                    <div id="tabsContent">
+                        <div id="requestTab">
+                            <pre class="diagram textarea block" contenteditable="true"></pre>
+                            <div class="block">
+                                <a href="#" target="blank" class="mb-5">Open image in a new tab...</a>
+                            </div>
+                            <img src="http://www.plantuml.com/plantuml/png/SoWkIImgAStDuN98pKi1qW00" alt="Diagram" />
                         </div>
-                        <img src="http://www.plantuml.com/plantuml/png/SoWkIImgAStDuN98pKi1qW00" alt="Diagram"
-                            id="requestImage" />
-                    </div>
-                    <div class="is-hidden" id="responseTab">
-                        <pre id="responseText" class="diagram textarea block" contenteditable="true"></pre>
-                        <div class="block">
-                            <a href="#" id="responseLink" target="blank">Open image in a new tab...</a>
+                        <div class="is-hidden" id="responseTab">
+                            <pre class="diagram textarea block" contenteditable="true"></pre>
+                            <div class="block">
+                                <a href="#" target="blank">Open image in a new tab...</a>
+                            </div>
+                            <img src="http://www.plantuml.com/plantuml/png/SoWkIImgAStDuN98pKi1qW00" alt="Diagram" />
                         </div>
-                        <img src="http://www.plantuml.com/plantuml/png/SoWkIImgAStDuN98pKi1qW00" alt="Diagram"
-                            id="responseImage" />
                     </div>
                 </div>
 
@@ -75,9 +75,19 @@
     <script>
         let diagrams = {};
 
+        function getEventParent(event) {
+            let parent = event.target;
+            while (parent.tagName !== 'LI') {
+                parent = parent.parentNode;
+            }
+            return parent;
+        }
+
+        // Aside menu
         function updateAsideMenu() {
             const servicesMenuElem = document.getElementById('servicesMenu');
             servicesMenuElem.innerHTML = '';
+            let firstMethod = null;
 
             for (const path in diagrams) {
                 const liPath = document.createElement('li');
@@ -85,43 +95,34 @@
                 const ulMethods = document.createElement('ul');
                 for (const method in diagrams[path]) {
                     const liMethod = document.createElement('li');
+                    liMethod.addEventListener('click', methodClick);
+                    liMethod.dataset.path = path;
+                    liMethod.dataset.method = method;
                     const aMethod = document.createElement('a');
                     aMethod.innerHTML = method;
-                    liMethod.addEventListener('click', (e) => {
-                        clearAsideMenuActive();
-                        e.target.className = 'is-active';
-                        const diagram = diagrams[path][method];
-                        if (diagram.request) {
-                            document.getElementById('requestText').innerHTML = diagram.request.diagram;
-                            document.getElementById('requestLink').href = diagram.request.imageUri;
-                            document.getElementById('requestImage').src = diagram.request.imageUri;
-                            document.getElementById('requestLink').className = '';
-                            document.getElementById('requestImage').className = '';
-                        } else {
-                            document.getElementById('requestText').innerHTML = 'No Request';
-                            document.getElementById('requestLink').className = 'is-hidden';
-                            document.getElementById('requestImage').className = 'is-hidden';
-                        }
-                        if (diagram.response) {
-                            document.getElementById('responseText').innerHTML = diagram.response.diagram;
-                            document.getElementById('responseLink').href = diagram.response.imageUri;
-                            document.getElementById('responseImage').src = diagram.response.imageUri;
-                            document.getElementById('responseLink').className = '';
-                            document.getElementById('responseImage').className = '';
-                        } else {
-                            document.getElementById('responseText').innerHTML = 'No Response';
-                            document.getElementById('responseLink').className = 'is-hidden';
-                            document.getElementById('responseImage').className = 'is-hidden';
-                        }
-                    });
                     liMethod.append(aMethod);
                     ulMethods.append(liMethod);
+                    if (!firstMethod) {
+                        firstMethod = aMethod;
+                    }
                 }
                 liPath.append(ulMethods);
                 servicesMenuElem.appendChild(liPath);
             }
+            methodClick({ target: firstMethod });
         }
-
+        function methodClick(e) {
+            clearAsideMenuActive();
+            const aMethod = e.target;
+            const liMethod = getEventParent(e);
+            aMethod.className = 'is-active';
+            const diagram = diagrams[liMethod.dataset.path][liMethod.dataset.method];
+            setDiagrams(diagram.request, 'requestTab');
+            setDiagrams(diagram.response, 'responseTab');
+            if (diagram.request || diagram.response) {
+                tabClick({ target: document.querySelector('#diagramsTabs li:not(.is-hidden)') })
+            }
+        }
         function clearAsideMenuActive() {
             const servicesMenuElem = document.getElementById('servicesMenu');
             const activeElements = servicesMenuElem.querySelectorAll('.is-active');
@@ -129,7 +130,50 @@
                 activeElement.className = '';
             }
         }
+        function setDiagrams(diagram, tabId) {
+            if (diagram) {
+                document.querySelector(`#${tabId} pre`).innerHTML = diagram.diagram;
+                document.querySelector(`#${tabId} a`).href = diagram.imageUri;
+                document.querySelector(`#${tabId} img`).src = diagram.imageUri;
+                document.querySelector(`#diagramsTabs li[data-tab='${tabId}']`).className = '';
+                document.querySelector(`#${tabId}`).className = '';
+            } else {
+                document.querySelector(`#diagramsTabs li[data-tab='${tabId}']`).className = 'is-hidden';
+                document.querySelector(`#${tabId}`).className = 'is-hidden';
+            }
+        }
 
+        // Tabs
+        document.querySelectorAll('#diagramsTabs li').forEach(diagramTab => {
+            diagramTab.addEventListener('click', tabClick);
+        });
+        function tabClick(e) {
+            clearDiagramsTabActive();
+            const diagramTab = getEventParent(e);
+            diagramTab.className = 'is-active';
+            document.getElementById(diagramTab.dataset.tab).className = '';
+        }
+        function clearDiagramsTabActive() {
+            const activeTabs = document.querySelectorAll('#diagramsTabs .is-active');
+            for (const activeTab of activeTabs) {
+                activeTab.className = '';
+                document.getElementById(activeTab.dataset.tab).className = 'is-hidden';
+            }
+            const tabsContent = document.querySelectorAll('#tabsContent > div');
+            for (const tabContent of tabsContent) {
+                tabContent.className = 'is-hidden';
+            }
+        }
+
+        // Starupt
+        (async () => {
+            const response = await fetch('./documentations/swagger.json');
+            const documentationJson = await response.json();
+            document.getElementById('documentation').textContent = JSON.stringify(documentationJson, 2, 2);
+            generateDiagrams();
+        })();
+
+        // Generate diagram
         async function generateDiagrams() {
             const documentation = document.getElementById('documentation').value;
             const generator = new SwaggerToPlantuml(JSON.parse(documentation));
@@ -138,28 +182,6 @@
             updateAsideMenu();
         }
         document.getElementById('documentation').addEventListener('input', generateDiagrams);
-
-        document.querySelectorAll('#diagramsTabs li').forEach(diagramTab => {
-            diagramTab.addEventListener('click', (e) => {
-                clearDiagramsTabActive();
-                diagramTab.className = 'is-active';
-                document.getElementById(diagramTab.dataset.tab).className = '';
-            });
-        });
-        function clearDiagramsTabActive() {
-            const activeTabs = document.querySelectorAll('#diagramsTabs li.is-active');
-            for (const activeTab of activeTabs) {
-                activeTab.className = '';
-                document.getElementById(activeTab.dataset.tab).className = 'is-hidden';
-            }
-        }
-
-        (async () => {
-            const response = await fetch('./documentations/swagger.json');
-            const documentationJson = await response.json();
-            document.getElementById('documentation').textContent = JSON.stringify(documentationJson);
-            generateDiagrams();
-        })();
     </script>
 </body>
 
