@@ -7,7 +7,7 @@ export interface IOptions {
 }
 
 const defaultOptions: IOptions = {
-    serverUrl: 'http://www.plantuml.com/plantuml',
+    serverUrl: 'https://www.plantuml.com/plantuml',
     format: 'svg'
 }
 
