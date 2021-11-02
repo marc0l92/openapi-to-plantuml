@@ -11,7 +11,6 @@ interface ISwaggerDoc {
                 parameters?: IServiceParameter[]
                 responses?: {
                     [index: string]: {
-                        $ref?: string
                         schema?: IDocDefinition
                     }
                 }

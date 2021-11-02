@@ -14,7 +14,7 @@
     <section class="section">
         <div class="container">
             <h1 class="title">OpenAPI Documentation</h1>
-            <p class="subtitle">Paste here your OpenApi documentation</p>
+            <p class="subtitle">Paste here your OpenApi or Swagger documentation</p>
             <div class="columns">
                 <div class="column">
                     <textarea id="documentation" class="documentation textarea"
@@ -167,7 +167,7 @@
 
         // Starupt
         (async () => {
-            const response = await fetch('./documentations/swagger.json');
+            const response = await fetch('./documentations/openApi.json');
             const documentationJson = await response.json();
             document.getElementById('documentation').textContent = JSON.stringify(documentationJson, 2, 2);
             generateDiagrams();
