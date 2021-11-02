@@ -3,8 +3,8 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 module.exports = {
     entry: './src/index.ts',
-    mode: 'development',
-    // mode: 'production',
+    // mode: 'development',
+    mode: 'production',
     module: {
         rules: [
             {
