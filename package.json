@@ -1,5 +1,5 @@
 {
-  "name": "swagger-to-plantuml",
+  "name": "openapi-to-plantuml",
   "version": "1.0.0",
   "description": "Convert swagger and openAPI definition in PlantUML diagrams.",
   "private": true,
