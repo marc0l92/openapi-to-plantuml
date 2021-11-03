@@ -66,25 +66,27 @@ export default class OpenApiDocumentation extends Documentation {
         for (const path in this._doc.paths) {
             services[path] = {}
             for (const method in this._doc.paths[path]) {
-                services[path][method] = {}
-                const docService = this._doc.paths[path][method]
+                if (['get', 'post', 'put', 'delete', 'patch'].indexOf(method) >= 0) {
+                    services[path][method] = {}
+                    const docService = this._doc.paths[path][method]
 
-                if (docService.requestBody
-                    && docService.requestBody.content
-                    && docService.requestBody.content['application/json']
-                    && docService.requestBody.content['application/json'].schema) {
-                    services[path][method].request = docService.requestBody.content['application/json'].schema
-                }
+                    if (docService.requestBody
+                        && docService.requestBody.content
+                        && docService.requestBody.content['application/json']
+                        && docService.requestBody.content['application/json'].schema) {
+                        services[path][method].request = docService.requestBody.content['application/json'].schema
+                    }
 
-                if (docService.responses) {
-                    for (const statusCode of Object.keys(docService.responses).sort()) {
-                        if (statusCode.match(/^2[0-9][0-9]$/) || statusCode === 'default') {
-                            if (docService.responses[statusCode].content
-                                && docService.responses[statusCode].content['application/json']
-                                && docService.responses[statusCode].content['application/json'].schema) {
-                                services[path][method].response = docService.responses[statusCode].content['application/json'].schema
+                    if (docService.responses) {
+                        for (const statusCode of Object.keys(docService.responses).sort()) {
+                            if (statusCode.match(/^2[0-9][0-9]$/) || statusCode === 'default') {
+                                if (docService.responses[statusCode].content
+                                    && docService.responses[statusCode].content['application/json']
+                                    && docService.responses[statusCode].content['application/json'].schema) {
+                                    services[path][method].response = docService.responses[statusCode].content['application/json'].schema
+                                }
+                                break
                             }
-                            break
                         }
                     }
                 }

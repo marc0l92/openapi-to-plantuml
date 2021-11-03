@@ -60,23 +60,25 @@ export default class SwaggerDoc extends Documentation {
         for (const path in this._doc.paths) {
             services[path] = {}
             for (const method in this._doc.paths[path]) {
-                services[path][method] = {}
-                const docService = this._doc.paths[path][method]
+                if (['get', 'post', 'put', 'delete', 'patch'].indexOf(method) >= 0) {
+                    services[path][method] = {}
+                    const docService = this._doc.paths[path][method]
 
-                if (docService.parameters) {
-                    const bodyParam = docService.parameters.find((p) => p.in === 'body')
-                    if (bodyParam) {
-                        services[path][method].request = bodyParam.schema
+                    if (docService.parameters) {
+                        const bodyParam = docService.parameters.find((p) => p.in === 'body')
+                        if (bodyParam) {
+                            services[path][method].request = bodyParam.schema
+                        }
                     }
-                }
 
-                if (docService.responses) {
-                    for (const statusCode of Object.keys(docService.responses).sort()) {
-                        if (statusCode.match(/^2[0-9][0-9]$/) || statusCode === 'default') {
-                            if (docService.responses[statusCode].schema) {
-                                services[path][method].response = docService.responses[statusCode].schema
+                    if (docService.responses) {
+                        for (const statusCode of Object.keys(docService.responses).sort()) {
+                            if (statusCode.match(/^2[0-9][0-9]$/) || statusCode === 'default') {
+                                if (docService.responses[statusCode].schema) {
+                                    services[path][method].response = docService.responses[statusCode].schema
+                                }
+                                break
                             }
-                            break
                         }
                     }
                 }

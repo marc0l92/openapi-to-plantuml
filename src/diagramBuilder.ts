@@ -18,6 +18,7 @@ const safeStr = (str: string) => {
 export default class DiagramBuilder {
     private options: IOptions
     private diagramText: string
+    private classes: string[] = []
 
     constructor(options: IOptions) {
         this.diagramText = '@startuml\n'
@@ -60,7 +61,7 @@ export default class DiagramBuilder {
     }
 
     buildDefinition(def: IDocDefinition): void {
-        let usedDefinitions: IDocDefinition[] = []
+        let usedDefinitions: Set<IDocDefinition> = new Set()
         let name = 'InlineDefinition'
         if (def.title) {
             name = def.title
@@ -86,16 +87,16 @@ export default class DiagramBuilder {
                 throw 'Definition type not supported: ' + def.type
         }
         usedDefinitions.forEach(usedDefinition => {
-            this.buildDefinition(usedDefinition)
+            if (this.classes.indexOf(usedDefinition.title) === -1) {
+                this.buildDefinition(usedDefinition)
+                this.classes.push(usedDefinition.title)
+            }
             this.buildLink(name, this.getDefName(usedDefinition))
         })
     }
 
-    buildProperty(name: string, property: IDocDefinition): IDocDefinition[] {
-        let usedDefinitions: IDocDefinition[] = []
-        if (property.title) {
-            name = property.title
-        }
+    buildProperty(name: string, property: IDocDefinition): Set<IDocDefinition> {
+        let usedDefinitions: Set<IDocDefinition> = new Set()
         if (!property.type) {
             property.type = EDocTypes.Object
         }
@@ -103,12 +104,12 @@ export default class DiagramBuilder {
             case EDocTypes.Array:
                 this.diagramText += `  {field} ${name}: [${this.getDefName((property as IDocArray).items)}]\n`
                 if ((property as IDocArray).items.type === EDocTypes.Object) {
-                    usedDefinitions.push((property as IDocArray).items)
+                    usedDefinitions.add((property as IDocArray).items)
                 }
                 break
             case EDocTypes.Object:
                 this.diagramText += `  {field} ${name}: ${this.getDefName(property)}\n`
-                usedDefinitions.push(property)
+                usedDefinitions.add(property)
                 break
             case EDocTypes.Boolean:
             case EDocTypes.Integer:
@@ -121,14 +122,14 @@ export default class DiagramBuilder {
         return usedDefinitions
     }
 
-    buildObject(name: string, objDef: IDocObject, type: string = 'class'): IDocDefinition[] {
-        let usedDefinitions: IDocDefinition[] = []
+    buildObject(name: string, objDef: IDocObject, type: string = 'class'): Set<IDocDefinition> {
+        let usedDefinitions: Set<IDocDefinition> = new Set()
         this.diagramText += `${type} ${safeStr(name)} {\n`
         for (const propName in objDef.properties) {
-            usedDefinitions = usedDefinitions.concat(this.buildProperty(propName, objDef.properties[propName]))
+            this.buildProperty(propName, objDef.properties[propName]).forEach(usedDefinitions.add, usedDefinitions)
         }
         if ('additionalProperties' in objDef) {
-            usedDefinitions = usedDefinitions.concat(this.buildProperty('{*}', objDef.additionalProperties))
+            this.buildProperty('{*}', objDef.additionalProperties).forEach(usedDefinitions.add, usedDefinitions)
         }
         this.diagramText += `}\n`
         return usedDefinitions
