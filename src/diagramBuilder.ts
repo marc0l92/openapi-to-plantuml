@@ -1,4 +1,4 @@
-import { EDocTypes, IDocArray, IDocDefinition, IDocObject } from "./documentation/definition"
+import { EDocTypes, IDocArray, IDocDefinition, IDocMapOfDefinitions, IDocObject } from "./documentation/definition"
 import * as plantumlEncoder from 'plantuml-encoder'
 
 export interface IOptions {
@@ -13,6 +13,23 @@ const defaultOptions: IOptions = {
 
 const safeStr = (str: string) => {
     return JSON.stringify(str)
+}
+
+const getDefName = (def: IDocDefinition): string => {
+    if (def) {
+        if (def.title) {
+            return def.title
+        }
+        if (def.type) {
+            if (def.type === 'array' && (def as IDocArray).items) {
+                return `[${getDefName((def as IDocArray).items)}]`
+            }
+            return `<i>${def.type}</i>`
+        }
+        return `<i>object</i>`
+    }
+    console.warn('No name defined for the definition:', def)
+    return 'NoName'
 }
 
 export default class DiagramBuilder {
@@ -36,24 +53,6 @@ export default class DiagramBuilder {
         return this.options.serverUrl + '/' + this.options.format + '/' + encodedDiagram
     }
 
-    // Internals
-
-    private getDefName(def: IDocDefinition): string {
-        if (def) {
-            if (def.title) {
-                return def.title
-            }
-            if (def.type) {
-                if (def.type === 'array' && (def as IDocArray).items) {
-                    return `[${this.getDefName((def as IDocArray).items)}]`
-                }
-                return `<i>${def.type}</i>`
-            }
-        }
-        console.warn('No name defined for the definition:', def)
-        return 'NoName'
-    }
-
     // Builder
 
     buildTitle(title: string): void {
@@ -61,7 +60,7 @@ export default class DiagramBuilder {
     }
 
     buildDefinition(def: IDocDefinition): void {
-        let usedDefinitions: Set<IDocDefinition> = new Set()
+        let usedDefinitions: IDocMapOfDefinitions = {}
         let name = 'InlineDefinition'
         if (def.title) {
             name = def.title
@@ -86,30 +85,31 @@ export default class DiagramBuilder {
             default:
                 throw 'Definition type not supported: ' + def.type
         }
-        usedDefinitions.forEach(usedDefinition => {
+        for (const defName in usedDefinitions) {
+            const usedDefinition = usedDefinitions[defName]
             if (this.classes.indexOf(usedDefinition.title) === -1) {
                 this.buildDefinition(usedDefinition)
                 this.classes.push(usedDefinition.title)
             }
-            this.buildLink(name, this.getDefName(usedDefinition))
-        })
+            this.buildLink(name, getDefName(usedDefinition))
+        }
     }
 
-    buildProperty(name: string, property: IDocDefinition): Set<IDocDefinition> {
-        let usedDefinitions: Set<IDocDefinition> = new Set()
+    buildProperty(name: string, property: IDocDefinition): IDocMapOfDefinitions {
+        let usedDefinitions: IDocMapOfDefinitions = {}
         if (!property.type) {
             property.type = EDocTypes.Object
         }
         switch (property.type) {
             case EDocTypes.Array:
-                this.diagramText += `  {field} ${name}: [${this.getDefName((property as IDocArray).items)}]\n`
+                this.diagramText += `  {field} ${name}: [${getDefName((property as IDocArray).items)}]\n`
                 if ((property as IDocArray).items.type === EDocTypes.Object) {
-                    usedDefinitions.add((property as IDocArray).items)
+                    usedDefinitions[getDefName((property as IDocArray).items)] = (property as IDocArray).items
                 }
                 break
             case EDocTypes.Object:
-                this.diagramText += `  {field} ${name}: ${this.getDefName(property)}\n`
-                usedDefinitions.add(property)
+                this.diagramText += `  {field} ${name}: ${getDefName(property)}\n`
+                usedDefinitions[getDefName(property)] = property
                 break
             case EDocTypes.Boolean:
             case EDocTypes.Integer:
@@ -122,14 +122,14 @@ export default class DiagramBuilder {
         return usedDefinitions
     }
 
-    buildObject(name: string, objDef: IDocObject, type: string = 'class'): Set<IDocDefinition> {
-        let usedDefinitions: Set<IDocDefinition> = new Set()
+    buildObject(name: string, objDef: IDocObject, type: string = 'class'): IDocMapOfDefinitions {
+        let usedDefinitions: IDocMapOfDefinitions = {}
         this.diagramText += `${type} ${safeStr(name)} {\n`
         for (const propName in objDef.properties) {
-            this.buildProperty(propName, objDef.properties[propName]).forEach(usedDefinitions.add, usedDefinitions)
+            usedDefinitions = Object.assign(usedDefinitions, this.buildProperty(propName, objDef.properties[propName]))
         }
         if ('additionalProperties' in objDef) {
-            this.buildProperty('{*}', objDef.additionalProperties).forEach(usedDefinitions.add, usedDefinitions)
+            usedDefinitions = Object.assign(usedDefinitions, this.buildProperty('{*}', objDef.additionalProperties))
         }
         this.diagramText += `}\n`
         return usedDefinitions
