@@ -134,7 +134,7 @@
         }
         function setDiagrams(diagram, tabId) {
             if (diagram) {
-                document.querySelector(`#${tabId} pre`).innerHTML = diagram.diagram;
+                document.querySelector(`#${tabId} pre`).innerText = diagram.diagram;
                 document.querySelector(`#${tabId} a`).href = diagram.imageUri;
                 document.querySelector(`#${tabId} img`).src = '';
                 document.querySelector(`#${tabId} img`).src = diagram.imageUri;
