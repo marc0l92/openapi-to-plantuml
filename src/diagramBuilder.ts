@@ -8,11 +8,15 @@ export interface IOptions {
 
 const defaultOptions: IOptions = {
     serverUrl: 'https://www.plantuml.com/plantuml',
-    format: 'svg'
+    format: 'svg',
 }
 
 const safeStr = (str: string) => {
     return JSON.stringify(str)
+}
+
+const isDefinition = (def: IDocDefinition): boolean => {
+    return 'title' in def
 }
 
 const getDefName = (def: IDocDefinition): string => {
@@ -61,7 +65,7 @@ export default class DiagramBuilder {
 
     buildDefinition(def: IDocDefinition): void {
         let usedDefinitions: IDocMapOfDefinitions = {}
-        let name = 'InlineDefinition'
+        let name = 'object'
         if (def.title) {
             name = def.title
         }
@@ -91,7 +95,7 @@ export default class DiagramBuilder {
                 this.buildDefinition(usedDefinition)
                 this.classes.push(usedDefinition.title)
             }
-            this.buildLink(name, getDefName(usedDefinition))
+            this.buildLink(name, defName)
         }
     }
 
@@ -102,14 +106,19 @@ export default class DiagramBuilder {
         }
         switch (property.type) {
             case EDocTypes.Array:
-                this.diagramText += `  {field} ${name}: [${getDefName((property as IDocArray).items)}]\n`
-                if ((property as IDocArray).items.type === EDocTypes.Object) {
-                    usedDefinitions[getDefName((property as IDocArray).items)] = (property as IDocArray).items
+                const arrayItems = (property as IDocArray).items
+                this.diagramText += `  {field} ${name}: [${getDefName(arrayItems)}]\n`
+                if (arrayItems.type === EDocTypes.Object) {
+                    if (isDefinition(arrayItems)) {
+                        usedDefinitions[getDefName(arrayItems)] = arrayItems
+                    }
                 }
                 break
             case EDocTypes.Object:
                 this.diagramText += `  {field} ${name}: ${getDefName(property)}\n`
-                usedDefinitions[getDefName(property)] = property
+                if (isDefinition(property)) {
+                    usedDefinitions[getDefName(property)] = property
+                }
                 break
             case EDocTypes.Boolean:
             case EDocTypes.Integer:

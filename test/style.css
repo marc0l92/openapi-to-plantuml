@@ -15,3 +15,7 @@
     margin: 0;
     width: 100%;
 }
+
+.menu-list > li {
+    word-wrap: break-word;
+}

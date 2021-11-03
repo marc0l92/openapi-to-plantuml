@@ -109,7 +109,9 @@
                 liPath.append(ulMethods);
                 servicesMenuElem.appendChild(liPath);
             }
-            methodClick({ target: firstMethod });
+            if (firstMethod) {
+                methodClick({ target: firstMethod });
+            }
         }
         function methodClick(e) {
             clearAsideMenuActive();
@@ -134,6 +136,7 @@
             if (diagram) {
                 document.querySelector(`#${tabId} pre`).innerHTML = diagram.diagram;
                 document.querySelector(`#${tabId} a`).href = diagram.imageUri;
+                document.querySelector(`#${tabId} img`).src = '';
                 document.querySelector(`#${tabId} img`).src = diagram.imageUri;
                 document.querySelector(`#diagramsTabs li[data-tab='${tabId}']`).className = '';
                 document.querySelector(`#${tabId}`).className = '';
