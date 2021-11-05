@@ -179,7 +179,10 @@
         // Generate diagram
         async function generateDiagrams() {
             const documentation = document.getElementById('documentation').value;
-            const generator = new SwaggerToPlantuml(JSON.parse(documentation));
+            const generator = new SwaggerToPlantuml(JSON.parse(documentation), {
+                serverUrl: 'https://www.planttext.com/api/plantuml',
+                format: 'svg',
+            });
             await generator.execute();
             diagrams = generator.getDiagrams();
             updateAsideMenu();
