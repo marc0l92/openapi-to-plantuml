@@ -180,7 +180,7 @@
         async function generateDiagrams() {
             const documentation = document.getElementById('documentation').value;
             const generator = new SwaggerToPlantuml(JSON.parse(documentation), {
-                serverUrl: 'https://www.planttext.com/api/plantuml',
+                serverUrl: 'https://plantuml-server.kkeisuke.dev',
                 format: 'svg',
                 diagramHeader: '',
             });
