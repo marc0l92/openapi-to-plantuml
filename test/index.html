@@ -182,6 +182,7 @@
             const generator = new SwaggerToPlantuml(JSON.parse(documentation), {
                 serverUrl: 'https://www.planttext.com/api/plantuml',
                 format: 'svg',
+                diagramHeader: '',
             });
             await generator.execute();
             diagrams = generator.getDiagrams();

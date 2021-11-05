@@ -4,6 +4,7 @@ import * as plantumlEncoder from 'plantuml-encoder'
 export interface IOptions {
     serverUrl?: string
     format?: string
+    diagramHeader?: string
 }
 
 const defaultOptions: IOptions = {
@@ -44,6 +45,7 @@ export default class DiagramBuilder {
     constructor(options: IOptions) {
         this.diagramText = '@startuml\n'
         this.options = Object.assign(defaultOptions, options)
+        this.diagramText += this.options.diagramHeader + '\n'
     }
 
     // Getters
