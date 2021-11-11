@@ -179,8 +179,8 @@
         // Generate diagram
         async function generateDiagrams() {
             const documentation = document.getElementById('documentation').value;
-            const generator = new SwaggerToPlantuml(JSON.parse(documentation), {
-                serverUrl: 'https://plantuml-server.kkeisuke.dev',
+            const generator = new SwaggerToPlantuml(documentation, {
+                // serverUrl: 'https://plantuml-server.kkeisuke.dev',
                 format: 'svg',
                 diagramHeader: '',
             });

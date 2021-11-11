@@ -2,6 +2,7 @@ import { Documentation } from './documentation/definition'
 import SwaggerDoc from './documentation/swaggerDocumentation'
 import OpenApiDocumentation from './documentation/openApiDocumentation'
 import DiagramBuilder, { IOptions } from './diagramBuilder'
+import * as YAML from 'js-yaml'
 
 interface IServiceDiagrams {
     [index: string]: {
@@ -25,7 +26,15 @@ export default class SwaggerToPlantuml {
 
     constructor(docJson: any, options: IOptions) {
         if (!(docJson instanceof Object)) {
-            throw 'Input documentation must be a JSON Object'
+            try {
+                docJson = JSON.parse(docJson)
+            } catch (e) {
+                try {
+                    docJson = YAML.load(docJson)
+                } catch (e) {
+                    throw new Error('The input documentation must be a valid JSON or YAML')
+                }
+            }
         }
 
         // Check swagger
