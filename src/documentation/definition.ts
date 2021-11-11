@@ -47,6 +47,7 @@ export interface IDocDefinition {
 }
 
 export interface IDocObject extends IDocDefinition {
+    required?: string[]
     properties?: IDocMapOfDefinitions
     additionalProperties?: IDocDefinition
 }

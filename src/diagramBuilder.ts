@@ -5,11 +5,18 @@ export interface IOptions {
     serverUrl?: string
     format?: string
     diagramHeader?: string
+    colors?: boolean
 }
 
 const defaultOptions: IOptions = {
     serverUrl: 'https://www.plantuml.com/plantuml',
     format: 'svg',
+    colors: true,
+}
+const colors = {
+    nativeTypes: '#06A77D',
+    field: '#36566D',
+    fieldMandatory: '#00568F',
 }
 
 const safeStr = (str: string) => {
@@ -18,23 +25,6 @@ const safeStr = (str: string) => {
 
 const isDefinition = (def: IDocDefinition): boolean => {
     return 'title' in def
-}
-
-const getDefName = (def: IDocDefinition): string => {
-    if (def) {
-        if (def.title) {
-            return def.title
-        }
-        if (def.type) {
-            if (def.type === 'array' && (def as IDocArray).items) {
-                return `[${getDefName((def as IDocArray).items)}]`
-            }
-            return `<i>${def.type}</i>`
-        }
-        return `<i>object</i>`
-    }
-    console.warn('No name defined for the definition:', def)
-    return 'NoName'
 }
 
 export default class DiagramBuilder {
@@ -101,7 +91,7 @@ export default class DiagramBuilder {
         }
     }
 
-    buildProperty(name: string, property: IDocDefinition): IDocMapOfDefinitions {
+    buildProperty(name: string, property: IDocDefinition, mandatory: boolean = false): IDocMapOfDefinitions {
         let usedDefinitions: IDocMapOfDefinitions = {}
         if (!property.type) {
             property.type = EDocTypes.Object
@@ -109,23 +99,23 @@ export default class DiagramBuilder {
         switch (property.type) {
             case EDocTypes.Array:
                 const arrayItems = (property as IDocArray).items
-                this.diagramText += `  {field} ${name}: [${getDefName(arrayItems)}]\n`
+                this.buildField(name, `[${this.getDefName(arrayItems)}]`, mandatory)
                 if (arrayItems.type === EDocTypes.Object) {
                     if (isDefinition(arrayItems)) {
-                        usedDefinitions[getDefName(arrayItems)] = arrayItems
+                        usedDefinitions[this.getDefName(arrayItems)] = arrayItems
                     }
                 }
                 break
             case EDocTypes.Object:
-                this.diagramText += `  {field} ${name}: ${getDefName(property)}\n`
+                this.buildField(name, this.getDefName(property), mandatory)
                 if (isDefinition(property)) {
-                    usedDefinitions[getDefName(property)] = property
+                    usedDefinitions[this.getDefName(property)] = property
                 }
                 break
             case EDocTypes.Boolean:
             case EDocTypes.Integer:
             case EDocTypes.String:
-                this.diagramText += `  {field} ${name}: <i>${property.type}</i>\n`
+                this.buildField(name, this.color(`<i>${property.type}</i>`, colors.nativeTypes), mandatory)
                 break
             default:
                 throw 'Property type not supported: ' + property.type
@@ -137,7 +127,8 @@ export default class DiagramBuilder {
         let usedDefinitions: IDocMapOfDefinitions = {}
         this.diagramText += `${type} ${safeStr(name)} {\n`
         for (const propName in objDef.properties) {
-            usedDefinitions = Object.assign(usedDefinitions, this.buildProperty(propName, objDef.properties[propName]))
+            const mandatory = 'required' in objDef && objDef.required.indexOf(propName) !== -1
+            usedDefinitions = Object.assign(usedDefinitions, this.buildProperty(propName, objDef.properties[propName], mandatory))
         }
         if ('additionalProperties' in objDef) {
             usedDefinitions = Object.assign(usedDefinitions, this.buildProperty('{*}', objDef.additionalProperties))
@@ -152,5 +143,38 @@ export default class DiagramBuilder {
 
     buildLink(from: string, to: string): void {
         this.diagramText += `${safeStr(from)} --> ${safeStr(to)}\n`
+    }
+
+    buildField(name: string, type: string, mandatory: boolean): void {
+        if (mandatory) {
+            name = this.color(`<b>${name}</b>`, colors.fieldMandatory)
+        } else {
+            name = this.color(`${name}`, colors.field)
+        }
+        this.diagramText += `  {field} ${name}: ${type}\n`
+    }
+
+    color(str: string, color: string): string {
+        if (this.options.colors) {
+            return `<color ${color}>${str}</color>`
+        }
+        return str
+    }
+
+    getDefName(def: IDocDefinition): string {
+        if (def) {
+            if (def.title) {
+                return def.title
+            }
+            if (def.type) {
+                if (def.type === 'array' && (def as IDocArray).items) {
+                    return `[${this.getDefName((def as IDocArray).items)}]`
+                }
+                return this.color(`<i>${def.type}</i>`, colors.nativeTypes)
+            }
+            return this.color(`<i>object</i>`, colors.nativeTypes)
+        }
+        console.warn('No name defined for the definition:', def)
+        return 'NoName'
     }
 }

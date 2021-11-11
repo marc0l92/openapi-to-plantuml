@@ -44,14 +44,14 @@
                     </div>
                     <div id="tabsContent">
                         <div id="requestTab">
-                            <pre class="diagram textarea block" contenteditable="true"></pre>
+                            <textarea class="diagram textarea block" readonly="true"></textarea>
                             <div class="block">
                                 <a href="#" target="blank" class="mb-5">Open image in a new tab...</a>
                             </div>
                             <img src="https://www.plantuml.com/plantuml/png/SoWkIImgAStDuN98pKi1qW00" alt="Diagram" />
                         </div>
                         <div class="is-hidden" id="responseTab">
-                            <pre class="diagram textarea block" contenteditable="true"></pre>
+                            <textarea class="diagram textarea block" readonly="true"></textarea>
                             <div class="block">
                                 <a href="#" target="blank">Open image in a new tab...</a>
                             </div>
@@ -134,7 +134,7 @@
         }
         function setDiagrams(diagram, tabId) {
             if (diagram) {
-                document.querySelector(`#${tabId} pre`).innerText = diagram.diagram;
+                document.querySelector(`#${tabId} textarea`).value = diagram.diagram;
                 document.querySelector(`#${tabId} a`).href = diagram.imageUri;
                 document.querySelector(`#${tabId} img`).src = '';
                 document.querySelector(`#${tabId} img`).src = diagram.imageUri;

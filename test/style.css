@@ -14,6 +14,8 @@
     background-color: #fef;
     margin: 0;
     width: 100%;
+    font-family: monospace;
+    white-space: pre;
 }
 
 .menu-list > li {
