@@ -14,8 +14,8 @@ const defaultOptions: IOptions = {
     colors: true,
 }
 const colors = {
-    nativeTypes: '#06A77D',
-    field: '#36566D',
+    nativeTypes: '#000000',
+    field: '#00568F',
     fieldMandatory: '#00568F',
 }
 
@@ -146,8 +146,9 @@ export default class DiagramBuilder {
     }
 
     buildField(name: string, type: string, mandatory: boolean): void {
+        name = `<b>${name}</b>`
         if (mandatory) {
-            name = this.color(`<b>${name}</b>`, colors.fieldMandatory)
+            name = this.color(`<u>${name}</u>`, colors.fieldMandatory)
         } else {
             name = this.color(`${name}`, colors.field)
         }
