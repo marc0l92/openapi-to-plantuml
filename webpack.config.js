@@ -19,9 +19,9 @@ module.exports = {
     },
     plugins: [new NodePolyfillPlugin()],
     output: {
-        filename: 'swagger-to-plantuml.js',
+        filename: 'openapi-to-plantuml.js',
         path: path.resolve(__dirname, 'dist'),
-        library: 'SwaggerToPlantuml',
+        library: 'OpenapiToPlantuml',
         libraryExport: 'default',
     },
 };
