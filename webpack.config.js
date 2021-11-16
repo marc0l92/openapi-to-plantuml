@@ -19,9 +19,9 @@ module.exports = {
     },
     plugins: [new NodePolyfillPlugin()],
     output: {
-        filename: 'openapi-to-plantuml.js',
+        filename: 'openapi2plantuml.js',
         path: path.resolve(__dirname, 'dist'),
-        library: 'OpenapiToPlantuml',
+        library: 'openapi2plantuml',
         libraryExport: 'default',
     },
 };

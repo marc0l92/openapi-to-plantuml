@@ -1,19 +1,21 @@
-# OpenApi-to-PlantUML
+# OpenApi 2 Plantuml
+
+![Known Vulnerabilities](https://snyk.io/test/github/marc0l92/openapi2plantuml/badge.svg)
 
 Parse your REST API documentation written using OpenApi or Swagger to generate PlantUML diagrams.
 
-[See this library in action](https://marc0l92.github.io/openapi-to-plantuml/test/index.html)
+[See this library in action](https://marc0l92.github.io/openapi2plantuml/test/index.html)
 
 ## Installation
 
 ```bash
-npm install openapi-to-plantuml
+npm install openapi2plantuml
 ```
 
 ## Usage
 
 ```javascript
-const openapiToPlantuml = require('openapi-to-plantuml');
+const openapiToPlantuml = require('openapi2plantuml');
 
 const documentation = `
 openapi: 3.0.0
