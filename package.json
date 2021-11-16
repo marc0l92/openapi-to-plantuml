@@ -2,6 +2,10 @@
   "name": "openapi2plantuml",
   "version": "1.0.0",
   "description": "Convert swagger and openAPI definition in PlantUML diagrams.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marc0l92/openapi2plantuml"
+  },
   "directories": {
     "doc": "doc",
     "test": "test"
