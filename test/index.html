@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test swagger-to-plantuml</title>
+    <title>Test OpenApi2PlantUml.js</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <link rel="stylesheet" href="./style.css">
 </head>
@@ -66,12 +66,12 @@
     <footer class="footer">
         <div class="content has-text-centered">
             <p>
-                <strong>swagger-to-plantuml</strong> by <a href="https://github.com/marc0l92">mar0l92</a>. The libray
+                <strong>OpenApi2PlantUml.js</strong> by <a href="https://github.com/marc0l92">mar0l92</a>. The libray
                 repository is available <a href="https://github.com/marc0l92">on GitHub</a>.
             </p>
         </div>
     </footer>
-    <script src="../dist/swagger-to-plantuml.js"></script>
+    <script src="../dist/OpenApi2PlantUml.js"></script>
     <script>
         let diagrams = {};
 
@@ -179,7 +179,7 @@
         // Generate diagram
         async function generateDiagrams() {
             const documentation = document.getElementById('documentation').value;
-            const generator = new SwaggerToPlantuml(documentation, {
+            const generator = new OpenApi2PlantUml(documentation, {
                 // serverUrl: 'https://plantuml-server.kkeisuke.dev',
                 format: 'svg',
                 diagramHeader: '',

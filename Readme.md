@@ -15,7 +15,7 @@ npm install openapi2plantuml
 ## Usage
 
 ```javascript
-const openapiToPlantuml = require('openapi2plantuml');
+const OpenApi2PlantUml = require('openapi2plantuml');
 
 const documentation = `
 openapi: 3.0.0
@@ -25,7 +25,7 @@ info:
 [...]
 `
 
-const generator = new SwaggerToPlantuml(documentation)
+const generator = new OpenApi2PlantUml(documentation)
 await generator.execute()
 const diagrams = generator.getDiagrams()
 ```
@@ -52,7 +52,7 @@ An example of `getDiagrams()` output is the following:
 
 The constructor accepts as second argument a options object.
 ```javascript
-const generator = new SwaggerToPlantuml(documentation, {
+const generator = new OpenApi2PlantUml(documentation, {
   serverUrl: 'https://www.plantuml.com/plantuml',
   format: 'svg',
   diagramHeader: '',

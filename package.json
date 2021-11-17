@@ -10,7 +10,7 @@
     "doc": "doc",
     "test": "test"
   },
-  "main": "dist/openapi2plantuml.js",
+  "main": "dist/OpenApi2PlantUml.js",
   "scripts": {
     "build": "webpack"
   },

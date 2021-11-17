@@ -19,7 +19,7 @@ interface IServiceDiagrams {
     }
 }
 
-export default class SwaggerToPlantuml {
+export default class OpenApi2PlantUml {
     private _doc: Documentation
     private _diagramOptions: IOptions = {}
     private _servicesDiagrams: IServiceDiagrams = {}
