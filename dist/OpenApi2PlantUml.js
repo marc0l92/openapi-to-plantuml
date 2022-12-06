@@ -22432,7 +22432,7 @@ Item.prototype.run = function () {
     this.fun.apply(null, this.array);
 };
 process.title = 'browser';
-process.browser = true;
+process.browser = false;
 process.env = {};
 process.argv = [];
 process.version = ''; // empty string to avoid regexp issues

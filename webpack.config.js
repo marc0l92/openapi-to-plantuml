@@ -1,12 +1,8 @@
-const path = require('path');
-const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const path = require('path')
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 
 module.exports = {
-    // entry: './src/index.ts',
-    entry: {
-        'OpenApi2PlantUml': './src/index.ts',
-        // 'OpenApi2PlantUml.min': './src/index.ts'
-    },
+    entry: './src/index.ts',
     devtool: 'source-map',
     mode: 'development',
     // mode: 'production',
@@ -23,11 +19,6 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js'],
     },
     plugins: [
-        // new webpack.optimize.UglifyJsPlugin({
-        //     minimize: true,
-        //     sourceMap: true,
-        //     include: /\.min\.js$/,
-        // }),
         new NodePolyfillPlugin(),
     ],
     output: {
@@ -40,4 +31,4 @@ module.exports = {
             type: 'umd',
         },
     },
-};
+}

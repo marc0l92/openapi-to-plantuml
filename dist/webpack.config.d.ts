@@ -1,7 +1,5 @@
 import NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
-export namespace entry {
-    const OpenApi2PlantUml: string;
-}
+export const entry: string;
 export const devtool: string;
 export const mode: string;
 export namespace module {
