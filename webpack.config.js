@@ -21,7 +21,11 @@ module.exports = {
     output: {
         filename: 'OpenApi2PlantUml.js',
         path: path.resolve(__dirname, 'dist'),
-        library: 'OpenApi2PlantUml',
         libraryExport: 'default',
+        globalObject: 'this',
+        library: {
+            name: 'OpenApi2PlantUml',
+            type: 'umd',
+        },
     },
 };

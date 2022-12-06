@@ -36,6 +36,9 @@ export default class OpenApi2PlantUml {
                 }
             }
         }
+        if(!(docJson instanceof Object)){
+            throw new Error('The input documentation must be a valid JSON or YAML')
+        }
 
         // Check swagger
         if ('swagger' in docJson && docJson.swagger === '2.0') {
