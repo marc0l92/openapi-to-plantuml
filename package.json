@@ -20,7 +20,7 @@
     "swagger",
     "openAPI"
   ],
-  "author": "Marco LUCARELLA",
+  "author": "marc0l92",
   "license": "MIT",
   "devDependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.1.0",
